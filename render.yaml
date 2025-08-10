@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: authigniter
+    env: node
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "npm start"
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false
+      - key: API_KEY
+        sync: false
+      - key: API_SECRET
+        sync: false
+      - key: THIRD_PARTY_API
+        sync: false
