@@ -1,7 +1,7 @@
 import User from "../models/User.js";
-import apiClient from "../utils/apiClient.js";
+import { apiClient } from "../utils/httpClients.js";
 
-export const getUsers = async (req, res) => {
+export const getUserConfig = async (req, res) => {
   try {
     const users = await User.find();
     res.json({ success: true, data: users });

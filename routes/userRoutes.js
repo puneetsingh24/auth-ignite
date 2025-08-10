@@ -1,9 +1,9 @@
 import express from "express";
-import { getUsers, createUser, fetchExternalData } from "../controllers/userController.js";
+import { getUserConfig, createUser, fetchExternalData } from "../controllers/userController.js";
 
 const router = express.Router();
 
-router.get("/", getUsers);
+router.get("/config", getUserConfig);
 router.post("/", createUser);
 router.get("/external", fetchExternalData);
 
