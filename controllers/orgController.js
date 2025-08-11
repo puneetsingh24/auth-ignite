@@ -48,6 +48,7 @@ export const createOrg = async (req, res) => {
 
     const orgData = orgResponse.data;
 
+    console.log("11111", orgData.Id)
     // Step 2: Add user to organization
     const ownershipResponse = await privateClient.put(
       `${process.env.THIRD_PARTY_API}/v2/manage/account/${req.user.Uid}/orgcontext/${orgData.Id}/roles`,
@@ -65,6 +66,7 @@ export const createOrg = async (req, res) => {
     });
 
   } catch (error) {
+    console.log("222222", error.message)
     if (error.response) {
       // Return exactly what the API sent
       return res

@@ -22,7 +22,7 @@ export const getUserOrgsAndRoles = async (req, res) => {
         },
       }
     );
-
+console.log(userOrgsRes.data)
     const orgContextList = userOrgsRes.data?.Data || [];
 
     // Step 2: Fetch org details in parallel
@@ -67,7 +67,7 @@ export const getUserOrgsAndRoles = async (req, res) => {
         .status(error.response.status || 500)
         .json(error.response.data);
     }
-    console.log("fffffffffff")
+
     res.status(500).json({
       Description: "Internal Server Error",
       ErrorCode: null,
