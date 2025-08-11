@@ -15,7 +15,7 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 
-app.use("/api/users", userRoutes);
+app.use("/users", userRoutes);
 app.use("/organization", orgRoutes);
 
 app.get('/', (req, res) => {
