@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import orgRoutes from "./routes/orgRoutes.js";
+import invitationRoutes from "./routes/invitationRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -17,6 +18,7 @@ app.use(express.json());
 
 app.use("/users", userRoutes);
 app.use("/organization", orgRoutes);
+app.use("/invitation", invitationRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running');
