@@ -56,6 +56,7 @@ export const getUserOrgsAndRoles = async (req, res) => {
 
     // Step 4: Send response
     res.json({
+      success: true,
       organizations: orgDetails,
       tenantRoles
     });

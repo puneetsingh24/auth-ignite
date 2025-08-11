@@ -61,9 +61,7 @@ export const createOrg = async (req, res) => {
       );
   
       res.json({
-        success: true,
-        organization: orgData,
-        ownership: ownershipResponse.data
+        success: true
       });
   
     } catch (error) {
