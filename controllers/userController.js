@@ -22,7 +22,7 @@ export const getUserOrgsAndRoles = async (req, res) => {
         },
       }
     );
-console.log(userOrgsRes.data)
+
     const orgContextList = userOrgsRes.data?.Data || [];
 
     // Step 2: Fetch org details in parallel
