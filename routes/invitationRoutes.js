@@ -12,7 +12,7 @@ import { authenticateUser, orgValidation} from '../middleware/authMiddleware.js'
 const router = express.Router();
 
 router.get("/",  authenticateUser,orgValidation, listInvitations);
-router.put("/{invitationId}",  authenticateUser, orgValidation, resendInvitation);
-router.delete("/{invitationId}",  authenticateUser, orgValidation, revokeInvitation);
+router.delete("/:invitationId",  authenticateUser, orgValidation, revokeInvitation);
+router.put("/:invitationId",  authenticateUser, orgValidation, resendInvitation);
 
 export default router;
