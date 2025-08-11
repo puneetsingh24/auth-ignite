@@ -191,6 +191,7 @@ export const sendInvitation = async (req, res) => {
       payload,
       {
         params: {
+          InvitationUrl:process.env.FRONTEND_URL,
           apikey: process.env.API_KEY,
           apisecret: process.env.API_SECRET,
         },
@@ -213,6 +214,76 @@ export const sendInvitation = async (req, res) => {
       Description: 'Internal Server Error',
       ErrorCode: null,
       Message: error.message,
+    });
+  }
+};
+
+
+export const deleteOrganization = async (req, res) => {
+  try {
+    
+    let orgId = req.user.orgId
+
+    // Delete Organization
+    await privateClient.delete(
+      `${process.env.THIRD_PARTY_API}/v2/manage/organizations/${orgId}`,
+      {
+        params: {
+          apikey: process.env.API_KEY,
+          apisecret: process.env.API_SECRET,
+        },
+      }
+    );
+ 
+    res.json({"sucess":true});
+
+  } catch (error) {
+    if (error.response) {
+      return res
+        .status(error.response.status || 500)
+        .json(error.response.data);
+    }
+    res.status(500).json({
+      Description: "Internal Server Error",
+      ErrorCode: null,
+      Message: error.message
+    });
+  }
+};
+
+
+
+
+
+export const removeMember = async (req, res) => {
+  try {
+    
+    let orgId = req.user.orgId
+    let uid = req.params.uid
+
+    // Delete member from organization
+    await privateClient.delete(
+      `${process.env.THIRD_PARTY_API}/v2/manage//account/${uid}/orgcontext/${orgId}`,
+      {
+        params: {
+          apikey: process.env.API_KEY,
+          apisecret: process.env.API_SECRET,
+        },
+      }
+    );
+ 
+    res.json({"sucess":true});
+
+  } catch (error) {
+    if (error.response) {
+      return res
+        .status(error.response.status || 500)
+        .json(error.response.data);
+    }
+    res.status(500).json({
+      Description: "Internal Server Error",
+      ErrorCode: null,
+      Message: error.message
     });
   }
 };
