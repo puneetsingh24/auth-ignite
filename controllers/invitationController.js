@@ -44,34 +44,67 @@ export const listInvitations = async (req, res) => {
   };
 
 
-export const revokeInvitation = async (req, res) => {
-  try {
-    
-    let invitationId = req.params.invitationId
-
-    // Remove invitation
-    await privateClient.delete(
-      `${process.env.THIRD_PARTY_API}/v2/manage/invitations/${invitationId}`,
-      {
-        params: {
-          apikey: process.env.API_KEY,
-          apisecret: process.env.API_SECRET,
-        },
+  export const revokeInvitation = async (req, res) => {
+    try {
+      
+      let invitationId = req.params.invitationId
+  
+      // Remove invitation
+      await privateClient.delete(
+        `${process.env.THIRD_PARTY_API}/v2/manage/invitations/${invitationId}`,
+        {
+          params: {
+            apikey: process.env.API_KEY,
+            apisecret: process.env.API_SECRET,
+          },
+        }
+      );
+   
+      res.json({"sucess":true});
+  
+    } catch (error) {
+      if (error.response) {
+        return res
+          .status(error.response.status || 500)
+          .json(error.response.data);
       }
-    );
- 
-    res.json({"sucess":true});
-
-  } catch (error) {
-    if (error.response) {
-      return res
-        .status(error.response.status || 500)
-        .json(error.response.data);
+      res.status(500).json({
+        Description: "Internal Server Error",
+        ErrorCode: null,
+        Message: error.message
+      });
     }
-    res.status(500).json({
-      Description: "Internal Server Error",
-      ErrorCode: null,
-      Message: error.message
-    });
-  }
-};
+  };
+
+
+  export const resendInvitation = async (req, res) => {
+    try {
+      
+      let invitationId = req.params.invitationId
+  
+      // Remove invitation
+      await privateClient.post(
+        `${process.env.THIRD_PARTY_API}/v2/manage/invitations/${invitationId}/resend`,
+        {
+          params: {
+            apikey: process.env.API_KEY,
+            apisecret: process.env.API_SECRET,
+          },
+        }
+      );
+   
+      res.json({"sucess":true});
+  
+    } catch (error) {
+      if (error.response) {
+        return res
+          .status(error.response.status || 500)
+          .json(error.response.data);
+      }
+      res.status(500).json({
+        Description: "Internal Server Error",
+        ErrorCode: null,
+        Message: error.message
+      });
+    }
+  };
