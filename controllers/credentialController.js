@@ -1,5 +1,6 @@
 import { privateClient } from "../utils/httpClients.js";
 import Credential from "../models/Credential.js";
+import axios from "axios";
 
 export const verifyCredential = async (req, res) => {
   try {
@@ -29,9 +30,9 @@ export const verifyCredential = async (req, res) => {
       if (uid == null) {
         // show error
       }
-      
+      didToken = process.env.DID_TOKEN.replace(/(\r\n|\n|\r)/gm, '');
 
-      const didResponse = await privateClient.post(
+      const didResponse = await axios.post(
         process.env.DID_API,
         {
         "authority": process.env.DID_AUTHORITY,
@@ -62,7 +63,7 @@ export const verifyCredential = async (req, res) => {
         },
         {
             headers: {
-                Authorization: `Bearer ${process.env.DID_TOKEN}`,
+                Authorization: `Bearer ${didToken}`,
             },
         }
       );
