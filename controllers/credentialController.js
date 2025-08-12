@@ -66,6 +66,15 @@ export const verifyCredential = async (req, res) => {
             },
         }
       );
+
+
+      let doc = await Credential.create({
+        state: uid,
+        requestStatus: "request_pending",
+        requestId: didResponse.data.requestId
+      });
+    
+      console.log("Inserted:", doc);
  
       res.json({
         "sucess":true, 
@@ -74,6 +83,7 @@ export const verifyCredential = async (req, res) => {
       });
   
     } catch (error) {
+      console.log(error)
       if (error.response) {
         return res
           .status(error.response.status || 500)
@@ -115,20 +125,24 @@ export const pingStatus = async (req, res) => {
 
         let credential = await Credential.findOne({requestId:requestId});
 
-
-        const loginResponse = await privateClient.get(
-        `${process.env.THIRD_PARTY_API}/identity/v2/manage/account/access_token`,
-        {
-          params: {
-            uid: credential.state,
-            apikey: process.env.API_KEY,
-            apisecret: process.env.API_SECRET,
-          },
+        if (credential != null) {
+          if (credential.requestStatus == "presentation_verified") {
+            const loginResponse = await privateClient.get(
+              `${process.env.THIRD_PARTY_API}/identity/v2/manage/account/access_token`,
+              {
+                params: {
+                  uid: credential.state,
+                  apikey: process.env.API_KEY,
+                  apisecret: process.env.API_SECRET,
+                },
+              }
+            );
+      
+            res.json({ access_token: loginResponse.data.access_token});
+          }
         }
-      );
 
-        res.json({ success: true, response: loginResponse.data });
-        
+        res.json({ access_token: null});
     } catch (error) {
         if (error.response) {
             return res

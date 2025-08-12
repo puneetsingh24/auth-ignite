@@ -17,6 +17,6 @@ router.post("/verify", verifyCredential);
 // router.post("/create/webhook", createWebhook);
 router.post("/webhook/verify", verifyWebhook);
 
-router.put("/ping/:requestId", authenticateUser, orgValidation, pingStatus);
+router.get("/ping/:requestId", pingStatus);
 
 export default router;
