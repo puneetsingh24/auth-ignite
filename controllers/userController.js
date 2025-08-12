@@ -36,7 +36,10 @@ export const getUserOrgsAndRoles = async (req, res) => {
           })
           .then(resp => ({
             Id: resp.data.Id,
-            Name: resp.data.Name
+            Name: resp.data.Name,
+            MFAMandatory: resp.data?.Policies?.MFAPolicy?.EnforcementMode === "force",
+            CreatedDate: resp.data.CreatedDate,
+            Domain: resp.data?.Domains?.[0]?.DomainName || ""
           }))
       )
     );
