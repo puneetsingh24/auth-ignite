@@ -31,9 +31,9 @@ export const verifyCredential = async (req, res) => {
         // show error
       }
       let didToken = process.env.DID_TOKEN.replace(/(\r\n|\n|\r)/gm, '');
-
+      
       const didResponse = await axios.post(
-        process.env.DID_API,
+        `${process.env.DID_API}/createPresentationRequest`,
         {
         "authority": process.env.DID_AUTHORITY,
         "registration": { "clientName": "Auth Ignite" },
@@ -63,8 +63,10 @@ export const verifyCredential = async (req, res) => {
         },
         {
             headers: {
+                "Content-Type": "application/json",
                 Authorization: `Bearer ${didToken}`,
             },
+            timeout: 10000 // 5 seconds
         }
       );
 
@@ -97,6 +99,75 @@ export const verifyCredential = async (req, res) => {
       });
     }
   };
+
+  export const createCredential = async (req, res) => {
+    try {
+      const email = req.user.Email[0].Value;
+  
+      let didToken = process.env.DID_TOKEN.replace(/(\r\n|\n|\r)/gm, '');
+  console.log("=======================",{
+    "authority": process.env.DID_AUTHORITY,
+    "registration": { "clientName": "Auth Ignite" },
+    "type": "MVP Email Credential",             
+    "manifest": process.env.DID_MANIFEST,
+    "claims": { "email": email },
+    "callback": {
+      "url": `${process.env.BACKEND_URL}/credential/webhook/verify`,
+      "state": req.user.Uid
+    }
+  })
+        const didResponse = await axios.post(
+          `${process.env.DID_API}/createIssuanceRequest`,
+          {
+            "authority": process.env.DID_AUTHORITY,
+            "registration": { "clientName": "Auth Ignite" },
+            "type": "MVP Email Credential",             
+            "manifest": process.env.DID_MANIFEST,
+            "claims": { "email": email },
+            "callback": {
+              "url": `${process.env.BACKEND_URL}/credential/webhook/verify`,
+              "state": req.user.Uid
+            }
+          },
+          {
+              headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${didToken}`,
+              },
+              timeout: 10000 // 5 seconds
+          }
+        );
+  
+        let doc = await Credential.create({
+          state: uid,
+          requestStatus: "request_pending",
+          requestId: didResponse.data.requestId
+        });
+      
+        console.log("Inserted:", doc);
+   
+        res.json({
+          "sucess":true, 
+          "qrcode": didResponse.data.url,
+          "guid": didResponse.data.requestId
+        });
+    
+      } catch (error) {
+        console.log(error)
+        if (error.response) {
+          return res
+            .status(error.response.status || 500)
+            .json(error.response.data);
+        }
+        res.status(500).json({
+          Description: "Internal Server Error",
+          ErrorCode: null,
+          Message: error.message
+        });
+      }
+    };
+
+  
 
 export const verifyWebhook = async (req, res) => {
     try {
