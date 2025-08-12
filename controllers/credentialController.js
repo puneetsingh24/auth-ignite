@@ -30,7 +30,7 @@ export const verifyCredential = async (req, res) => {
       if (uid == null) {
         // show error
       }
-      didToken = process.env.DID_TOKEN.replace(/(\r\n|\n|\r)/gm, '');
+      let didToken = process.env.DID_TOKEN.replace(/(\r\n|\n|\r)/gm, '');
 
       const didResponse = await axios.post(
         process.env.DID_API,
