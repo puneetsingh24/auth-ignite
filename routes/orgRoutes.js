@@ -19,6 +19,6 @@ router.post("/invite",  authenticateUser, orgValidation, sendInvitation);
 router.get("/members",  authenticateUser, orgValidation, getOrgMembers);
 router.delete("/",  authenticateUser, orgValidation, deleteOrganization);
 router.delete("/members/:uid",  authenticateUser, orgValidation, removeMember);
-router.post("/mfa",  authenticateUser, orgValidation, updateOrgMFA);
+router.put("/mfa",  authenticateUser, orgValidation, updateOrgMFA);
 
 export default router;
