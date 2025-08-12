@@ -58,7 +58,8 @@ export const getUserOrgsAndRoles = async (req, res) => {
     res.json({
       success: true,
       organizations: orgDetails,
-      tenantRoles
+      tenantRoles,
+      userInfo:{"Email":req.user.Email[0].value,"Uid":req.user.Uid}
     });
 
   } catch (error) {
