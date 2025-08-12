@@ -59,7 +59,10 @@ export const getUserOrgsAndRoles = async (req, res) => {
       success: true,
       organizations: orgDetails,
       tenantRoles,
-      userInfo:{"Email":req.user.Email[0].value,"Uid":req.user.Uid}
+      userInfo:{
+        "Email":req.user.Email[0].Value,
+        "Uid":req.user.Uid
+      }
     });
 
   } catch (error) {
