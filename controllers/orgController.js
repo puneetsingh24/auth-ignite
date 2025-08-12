@@ -1,15 +1,5 @@
-import User from "../models/User.js";
 import { privateClient } from "../utils/httpClients.js";
 import { CONSTANT } from "../config/constant.js";
-
-export const getUsers = async (req, res) => {
-  try {
-    const users = await User.find();
-    res.json({ success: true, data: users });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
 
 export const createOrg = async (req, res) => {
   try {
@@ -109,7 +99,7 @@ export const getOrgMembers = async (req, res) => {
 
     const memberDetails = await Promise.all(
       members.map(async (member) => {
-        console.log(">>",member)
+
         const roleId = member.Roles?.[0] || null;
         let roleData = null;
 
@@ -174,7 +164,7 @@ export const sendInvitation = async (req, res) => {
       "InviterUid": req.user.Uid
     }
 
-    console.log(payload)
+
     // Step 1: send Inviation
     const invitationResponse = await privateClient.post(
       `${process.env.THIRD_PARTY_API}/v2/manage/invitations`,
@@ -283,7 +273,6 @@ export const updateOrgMFA = async (req, res) => {
   try {
     const { MFAMandatory } = req.body;
 
-    console.log("bbbbbbbbbbbbbbbbbbb")
     let enforcementMode = "optional"
     if (MFAMandatory) {
       enforcementMode = "force"

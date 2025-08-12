@@ -18,3 +18,13 @@ services:
         sync: false
       - key: FRONTEND_URL
         sync: false
+      - key: BACKEND_URL
+        sync: false
+      - key: DID_API
+        sync: false
+      - key: DID_AUTHORITY
+        sync: false
+      - key: DID_TOKEN
+        sync: false
+      - key: DID_MANIFEST
+        sync: false

@@ -10,7 +10,7 @@ export const authenticateUser = async (req, res, next) => {
             Message: "A parameter is not formatted correctly",
           });
     }
-console.log("zzzzzzzzzzzzzzz")
+
     const token = authHeader.split(' ')[1];
 
     try {
@@ -44,7 +44,7 @@ console.log("zzzzzzzzzzzzzzz")
 };
 
 export const orgValidation = async (req, res, next) => {
-    console.log("xxxxxxxxxx")
+
     const orgId = req.query.org_id
     if (!orgId || orgId == "") {
         return res.status(401).json({
@@ -62,7 +62,7 @@ export const orgValidation = async (req, res, next) => {
                 apisecret: process.env.API_SECRET
             },
         });
-        console.log(data)
+
         // Attach user data to request
         let roleId = data?.Data?.[0]?.RoleId || null;
 
@@ -76,7 +76,7 @@ export const orgValidation = async (req, res, next) => {
 
         req.user.roleId = roleId
         req.user.orgId = orgId
-        console.log("yyyyyyyyyyy")
+
         next();
     } catch (error) {
         console.error('Auth error:', error.message);

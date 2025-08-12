@@ -1,6 +1,5 @@
-import User from "../models/User.js";
+
 import { privateClient } from "../utils/httpClients.js";
-import axios, { formToJSON } from "axios";
 
 // const privateClient = axios.create({
 //   baseURL: process.env.THIRD_PARTY_API,

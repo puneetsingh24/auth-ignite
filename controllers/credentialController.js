@@ -1,32 +1,76 @@
 import { privateClient } from "../utils/httpClients.js";
-import { ROLE_NAME_MAP } from "../config/constant.js";
+import Credential from "../models/Credential.js";
 
-export const listInvitations = async (req, res) => {
+export const verifyCredential = async (req, res) => {
   try {
-    let orgId = req.user.orgId
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({
+            Description: 'The email is a required parameter.',
+            ErrorCode: 908,
+            Message: "A parameter is not formatted correctly",
+        });
+    }
 
     const response = await privateClient.get(
-        `${process.env.THIRD_PARTY_API}/v2/manage/invitations`,
+        `${process.env.THIRD_PARTY_API}/identity/v2/manage/account/identities`,
         {
           params: {
-            orgid: orgId,
+            email: email,
             apikey: process.env.API_KEY,
             apisecret: process.env.API_SECRET,
           },
         }
       );
 
-      const invitationList = response.data?.Data || [];
+      const uid = response.data?.Data?.[0]?.Uid || null;
 
+      if (uid == null) {
+        // show error
+      }
+      
+
+      const didResponse = await privateClient.post(
+        process.env.DID_API,
+        {
+        "authority": process.env.DID_AUTHORITY,
+        "registration": { "clientName": "Auth Ignite" },
+        "callback": {
+            "url": `${process.env.BACKEND_URL}/credential/webhook/verify`,
+            "state": uid
+        },
+        "requestedCredentials": [
+            {
+            "type": "MVP Email Credential",
+            "constraints": [
+                {
+                "claimName": "email",
+                "values": [
+                    email
+                ]
+                }
+            ],
+            "configuration": {
+                "validation": {
+                "allowRevoked": false
+                }
+            },
+            "purpose": "Verify a user with did credentials"
+            }
+        ]
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${process.env.DID_TOKEN}`,
+            },
+        }
+      );
+ 
       res.json({
         "sucess":true, 
-        "invitations": invitationList.map((invitation) => ({
-                Id: invitation.Id,
-                Role: ROLE_NAME_MAP[invitation.RoleIds[0]],
-                Status: invitation.Status,
-                Email: invitation.EmailId,
-                InvitedDate: invitation.CreatedDate
-              }))
+        "qrcode": didResponse.data.url,
+        "guid": didResponse.data.requestId
       });
   
     } catch (error) {
@@ -43,68 +87,58 @@ export const listInvitations = async (req, res) => {
     }
   };
 
-
-  export const revokeInvitation = async (req, res) => {
+export const verifyWebhook = async (req, res) => {
     try {
-      
-      let invitationId = req.params.invitationId
-  
-      // Remove invitation
-      await privateClient.delete(
-        `${process.env.THIRD_PARTY_API}/v2/manage/invitations/${invitationId}`,
+        const { requestId, requestStatus, state } = req.body;
+
+        await Credential.updateOne({requestId:requestId, state:state},{$set:{requestStatus: requestStatus}});
+
+        res.json({ success: true });
+        
+    } catch (error) {
+        if (error.response) {
+            return res
+            .status(error.response.status || 500)
+            .json(error.response.data);
+        }
+        res.status(500).json({
+            Description: "Internal Server Error",
+            ErrorCode: null,
+            Message: error.message
+        });
+    }
+};
+
+export const pingStatus = async (req, res) => {
+    try {
+        const requestId = req.params.requestId;
+
+        let credential = await Credential.findOne({requestId:requestId});
+
+
+        const loginResponse = await privateClient.get(
+        `${process.env.THIRD_PARTY_API}/identity/v2/manage/account/access_token`,
         {
           params: {
+            uid: credential.state,
             apikey: process.env.API_KEY,
             apisecret: process.env.API_SECRET,
           },
         }
       );
-   
-      res.json({"sucess":true});
-  
+
+        res.json({ success: true, response: loginResponse.data });
+        
     } catch (error) {
-      if (error.response) {
-        return res
-          .status(error.response.status || 500)
-          .json(error.response.data);
-      }
-      res.status(500).json({
-        Description: "Internal Server Error",
-        ErrorCode: null,
-        Message: error.message
-      });
-    }
-  };
-
-
-  export const resendInvitation = async (req, res) => {
-    try {
-      
-      let invitationId = req.params.invitationId
-  
-      // Remove invitation
-      await privateClient.post(
-        `${process.env.THIRD_PARTY_API}/v2/manage/invitations/${invitationId}/resend`,
-        {
-          params: {
-            apikey: process.env.API_KEY,
-            apisecret: process.env.API_SECRET,
-          },
+        if (error.response) {
+            return res
+            .status(error.response.status || 500)
+            .json(error.response.data);
         }
-      );
-   
-      res.json({"sucess":true});
-  
-    } catch (error) {
-      if (error.response) {
-        return res
-          .status(error.response.status || 500)
-          .json(error.response.data);
-      }
-      res.status(500).json({
-        Description: "Internal Server Error",
-        ErrorCode: null,
-        Message: error.message
-      });
+        res.status(500).json({
+            Description: "Internal Server Error",
+            ErrorCode: null,
+            Message: error.message
+        });
     }
-  };
+};
