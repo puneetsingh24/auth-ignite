@@ -139,7 +139,7 @@ export const pingStatus = async (req, res) => {
               }
             );
       
-            res.json({ access_token: loginResponse.data.access_token});
+            return res.json({ access_token: loginResponse.data.access_token});
           }
         }
 
