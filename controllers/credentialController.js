@@ -1,5 +1,6 @@
 import { privateClient } from "../utils/httpClients.js";
 import Credential from "../models/Credential.js";
+import { getAccessToken } from "../utils/tokenManager.js";
 import axios from "axios";
 import https from 'https';
 
@@ -8,6 +9,9 @@ const agent = new https.Agent({ keepAlive: true });
 export const verifyCredential = async (req, res) => {
   
   try {
+
+    const token = await getAccessToken();
+
     const { email } = req.body;
 
     if (!email) {
@@ -34,7 +38,7 @@ export const verifyCredential = async (req, res) => {
       if (uid == null) {
         // show error
       }
-      let didToken = process.env.DID_TOKEN.replace(/(\r\n|\n|\r)/gm, '');
+      let didToken = token.replace(/(\r\n|\n|\r)/gm, '');
       
       const didResponse = await axios.post(
         `${process.env.DID_API}/createPresentationRequest`,
@@ -108,8 +112,10 @@ export const verifyCredential = async (req, res) => {
   export const createCredential = async (req, res) => {
     try {
       const email = req.user.Email[0].Value;
+
+      let token = await getAccessToken();
   
-      let didToken = process.env.DID_TOKEN.replace(/(\r\n|\n|\r)/gm, '');
+      let didToken = token.replace(/(\r\n|\n|\r)/gm, '');
 
         const didResponse = await axios.post(
           `${process.env.DID_API}/createIssuanceRequest`,

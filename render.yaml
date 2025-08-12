@@ -24,7 +24,11 @@ services:
         sync: false
       - key: DID_AUTHORITY
         sync: false
-      - key: DID_TOKEN
-        sync: false
       - key: DID_MANIFEST
+        sync: false
+      - key: AZURE_TENANT_ID
+        sync: false
+      - key: AZURE_CLIENT_ID
+        sync: false
+      - key: AZURE_CLIENT_SECRET
         sync: false
