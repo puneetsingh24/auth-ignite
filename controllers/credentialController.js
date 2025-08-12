@@ -1,8 +1,12 @@
 import { privateClient } from "../utils/httpClients.js";
 import Credential from "../models/Credential.js";
 import axios from "axios";
+import https from 'https';
+
+const agent = new https.Agent({ keepAlive: true });
 
 export const verifyCredential = async (req, res) => {
+  
   try {
     const { email } = req.body;
 
@@ -66,7 +70,8 @@ export const verifyCredential = async (req, res) => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${didToken}`,
             },
-            timeout: 10000 // 5 seconds
+            httpsAgent: agent,
+            timeout: 15000 // 15 seconds
         }
       );
 
@@ -105,17 +110,7 @@ export const verifyCredential = async (req, res) => {
       const email = req.user.Email[0].Value;
   
       let didToken = process.env.DID_TOKEN.replace(/(\r\n|\n|\r)/gm, '');
-  console.log("=======================",{
-    "authority": process.env.DID_AUTHORITY,
-    "registration": { "clientName": "Auth Ignite" },
-    "type": "MVP Email Credential",             
-    "manifest": process.env.DID_MANIFEST,
-    "claims": { "email": email },
-    "callback": {
-      "url": `${process.env.BACKEND_URL}/credential/webhook/verify`,
-      "state": req.user.Uid
-    }
-  })
+
         const didResponse = await axios.post(
           `${process.env.DID_API}/createIssuanceRequest`,
           {
@@ -134,12 +129,13 @@ export const verifyCredential = async (req, res) => {
                   "Content-Type": "application/json",
                   Authorization: `Bearer ${didToken}`,
               },
-              timeout: 10000 // 5 seconds
+              httpsAgent: agent,
+              timeout: 15000 // 15 seconds
           }
         );
   
         let doc = await Credential.create({
-          state: uid,
+          state: req.user.Uid,
           requestStatus: "request_pending",
           requestId: didResponse.data.requestId
         });
