@@ -11,17 +11,6 @@ export const getUsers = async (req, res) => {
   }
 };
 
-const createUser = async (req, res) => {
-  try {
-    const { name, email } = req.body;
-    const user = new User({ name, email });
-    await user.save();
-    res.status(201).json({ success: true, data: user });
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
-  }
-};
-
 export const createOrg = async (req, res) => {
   try {
     const { name, domain } = req.body;
@@ -102,7 +91,7 @@ export const getOrgMembers = async (req, res) => {
 
   try {
     let orgId = req.user.orgId
-console.log("=============1")
+
     // Step 1: Get all users with roles from the org
     const membersRes = await privateClient.get(
       `${process.env.THIRD_PARTY_API}/v2/manage/organizations/${orgId}/orgcontext`,
@@ -115,7 +104,6 @@ console.log("=============1")
     );
     const members = membersRes.data?.Data || [];
 
-    console.log("=====================================",members)
     // Step 2: Cache for role details so we don’t fetch same role twice
     const roleCache = {};
 
@@ -286,6 +274,55 @@ export const removeMember = async (req, res) => {
       Description: "Internal Server Error",
       ErrorCode: null,
       Message: error.message
+    });
+  }
+};
+
+
+export const updateOrgMFA = async (req, res) => {
+  try {
+    const { MFAMandatory } = req.body;
+
+    console.log("bbbbbbbbbbbbbbbbbbb")
+    let enforcementMode = "optional"
+    if (MFAMandatory) {
+      enforcementMode = "force"
+    }
+
+    let payload = {
+      "MFAPolicy": {
+        "EnforcementMode": enforcementMode,
+      },
+    }
+
+    const mfaResponse = await privateClient.put(
+      `${process.env.THIRD_PARTY_API}/v2/manage/organizations/${req.user.orgId}/policy`,
+      payload,
+      {
+        params: {
+          apikey: process.env.API_KEY,
+          apisecret: process.env.API_SECRET,
+        },
+      }
+    );
+
+    res.json({
+      success: true,
+      MFAMandatory: MFAMandatory
+    });
+
+  } catch (error) {
+    if (error.response) {
+      // Return exactly what the API sent
+      return res
+        .status(error.response.status || 500)
+        .json(error.response.data);
+    }
+
+    res.status(500).json({
+      Description: 'Internal Server Error',
+      ErrorCode: null,
+      Message: error.message,
     });
   }
 };

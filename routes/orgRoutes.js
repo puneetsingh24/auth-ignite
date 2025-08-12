@@ -5,7 +5,8 @@ import {
     sendInvitation, 
     getOrgMembers, 
     deleteOrganization, 
-    removeMember 
+    removeMember , 
+    updateOrgMFA 
 } from "../controllers/orgController.js";
 
 import { authenticateUser, orgValidation} from '../middleware/authMiddleware.js';
@@ -18,5 +19,6 @@ router.post("/invite",  authenticateUser, orgValidation, sendInvitation);
 router.get("/members",  authenticateUser, orgValidation, getOrgMembers);
 router.delete("/",  authenticateUser, orgValidation, deleteOrganization);
 router.delete("/members/:uid",  authenticateUser, orgValidation, removeMember);
+router.post("/mfa",  authenticateUser, orgValidation, updateOrgMFA);
 
 export default router;
