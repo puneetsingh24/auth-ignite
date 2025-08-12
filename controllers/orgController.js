@@ -99,10 +99,10 @@ export const createOrg = async (req, res) => {
 
 
 export const getOrgMembers = async (req, res) => {
-  try {
-    
-    let orgId = req.user.orgId
 
+  try {
+    let orgId = req.user.orgId
+console.log("=============1")
     // Step 1: Get all users with roles from the org
     const membersRes = await privateClient.get(
       `${process.env.THIRD_PARTY_API}/v2/manage/organizations/${orgId}/orgcontext`,
@@ -115,11 +115,13 @@ export const getOrgMembers = async (req, res) => {
     );
     const members = membersRes.data?.Data || [];
 
+    console.log("=====================================",members)
     // Step 2: Cache for role details so we don’t fetch same role twice
     const roleCache = {};
 
     const memberDetails = await Promise.all(
       members.map(async (member) => {
+        console.log(">>",member)
         const roleId = member.Roles?.[0] || null;
         let roleData = null;
 

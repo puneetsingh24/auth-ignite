@@ -64,7 +64,15 @@ export const orgValidation = async (req, res, next) => {
         });
         console.log(data)
         // Attach user data to request
-        let roleId = data.Data[0].RoleId;
+        let roleId = data?.Data?.[0]?.RoleId || null;
+
+        if (roleId == null) {
+            return res.status(401).json({
+                Description: 'Internal Server Error',
+                ErrorCode: 401,
+                Message: "Invalid token",
+            });
+        }
 
         req.user.roleId = roleId
         req.user.orgId = orgId
